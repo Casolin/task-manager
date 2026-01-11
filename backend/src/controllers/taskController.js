@@ -2,15 +2,29 @@ import Task from "../models/Task.js";
 
 export const taskList = async (req, res) => {
   try {
-    const tasks = await Task.find({ createdBy: req.user.id }).populate(
-      "assignedUsers",
-      "pfp username email"
-    );
+    const tasks = await Task.find({ createdBy: req.user.id })
+      .populate("createdBy", "pfp username email")
+      .populate("assignedUsers", "pfp username email");
+
     if (!tasks) return res.status(404).json("No tasks found");
 
     tasks.forEach((task) => {
+      if (
+        task.createdBy?.pfp &&
+        !task.createdBy.pfp.startsWith("http") &&
+        !task.createdBy.pfp.startsWith("data:")
+      ) {
+        task.createdBy.pfp = `${req.protocol}://${req.get("host")}${
+          task.createdBy.pfp
+        }`;
+      }
+
       task.assignedUsers.forEach((user) => {
-        if (user.pfp && !user.pfp.startsWith("http")) {
+        if (
+          user.pfp &&
+          !user.pfp.startsWith("http") &&
+          !user.pfp.startsWith("data:")
+        ) {
           user.pfp = `${req.protocol}://${req.get("host")}${user.pfp}`;
         }
       });
