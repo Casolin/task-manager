@@ -29,5 +29,3 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", taskRouter);
-
-startServer();
