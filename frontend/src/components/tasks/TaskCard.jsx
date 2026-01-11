@@ -83,7 +83,13 @@ export const TaskCard = ({ task }) => {
         {assignedUsers.slice(0, maxVisible).map((user) => (
           <img
             key={user._id || user.username}
-            src={user.pfp || "/default-pfp.png"}
+            src={
+              user.pfp
+                ? user.pfp.startsWith("http") || user.pfp.startsWith("data:")
+                  ? user.pfp
+                  : `${import.meta.env.VITE_API_URL}${user.pfp}`
+                : "/default-pfp.png"
+            }
             alt={user.username || "User"}
             className="w-8 h-8 rounded-full border-2 border-[#1b0a0f]"
           />
