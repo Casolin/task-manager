@@ -21,17 +21,7 @@ app.use(
   })
 );
 
-const startServer = async () => {
-  try {
-    await startDB();
-    app.listen(process.env.PORT, () => {
-      console.log(`Running on PORT : ${process.env.PORT}`);
-    });
-  } catch (error) {
-    console.error("Failed to start server", error.message);
-    process.exit(1);
-  }
-};
+await startDB();
 
 app.get("/", (req, res) => {
   res.send("Welcome User");
