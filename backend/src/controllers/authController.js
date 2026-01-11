@@ -75,18 +75,20 @@ export const profile = async (req, res) => {
   }
 };
 
+import User from "../models/User.js";
+
 export const pfpUpdate = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    const { pfp } = req.body;
+    if (!pfp) return res.status(400).json({ message: "No file uploaded" });
 
-    user.pfp = `/uploads/${req.file.filename}`;
+    user.pfp = pfp;
     await user.save();
 
-    const fullUrl = `${req.protocol}://${req.get("host")}${user.pfp}`;
-    res.status(200).json({ pfp: fullUrl });
+    res.status(200).json({ pfp: user.pfp });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

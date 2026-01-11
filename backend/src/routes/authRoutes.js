@@ -6,7 +6,6 @@ import {
   profile,
   pfpUpdate,
 } from "../controllers/authController.js";
-import { upload } from "../middleware/multer.js";
 
 const router = express.Router();
 
@@ -14,6 +13,6 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/profile", authenticate, profile);
 
-router.patch("/user/pfp", authenticate, upload.single("pfp"), pfpUpdate);
+router.patch("/user/pfp", authenticate, pfpUpdate);
 
 export default router;

@@ -42,14 +42,20 @@ export const Sidebar = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    try {
-      await updatePfp(file);
-      toast.success("Profile picture updated!");
-    } catch {
-      toast.error("Failed to update profile picture");
-    }
-  };
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result;
 
+      try {
+        await updatePfp(base64);
+        toast.success("Profile picture updated!");
+      } catch {
+        toast.error("Failed to update profile picture");
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
   if (!user) return null;
 
   return (
