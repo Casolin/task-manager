@@ -37,6 +37,22 @@ export const TaskCard = ({ task }) => {
       ? "bg-yellow-600"
       : "bg-red-600";
 
+  const renderAvatar = (user) => {
+    const src = user?.pfp
+      ? user.pfp.startsWith("http") || user.pfp.startsWith("data:")
+        ? user.pfp
+        : `${import.meta.env.VITE_API_URL}${user.pfp}`
+      : "/default-pfp.png";
+    return (
+      <img
+        key={user?._id || user?.username}
+        src={src}
+        alt={user?.username || "User"}
+        className="w-8 h-8 rounded-full border-2 border-[#1b0a0f]"
+      />
+    );
+  };
+
   return (
     <div className="bg-[#1b0a0f] border border-[#2b0e15] rounded-xl p-6 shadow-lg">
       <div className="flex justify-between text-sm mb-3">
@@ -80,23 +96,10 @@ export const TaskCard = ({ task }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        {assignedUsers.slice(0, maxVisible).map((user) => (
-          <img
-            key={user._id || user.username}
-            src={
-              user.pfp
-                ? user.pfp.startsWith("http") || user.pfp.startsWith("data:")
-                  ? user.pfp
-                  : `${import.meta.env.VITE_API_URL}${user.pfp}`
-                : "/default-pfp.png"
-            }
-            alt={user.username || "User"}
-            className="w-8 h-8 rounded-full border-2 border-[#1b0a0f]"
-          />
-        ))}
-
+        {task.createdBy && renderAvatar(task.createdBy)}
+        {assignedUsers.slice(0, maxVisible).map(renderAvatar)}
         {extraUsers > 0 && (
-          <div className="w-8 h-8 rounded-full bg-[#2b0e15] text-xs font-semibold flex items-center justify-center border-2 border-[#1b0a0f] text-white">
+          <div className="w-8 h-8 rounded-full bg-[#2b0e15] text-xs font-semibold flex items-center justify-center border-2 border-[#1b0e0f] text-white">
             +{extraUsers}
           </div>
         )}
