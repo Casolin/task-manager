@@ -12,20 +12,15 @@ const app = express();
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
 app.use(morgan("dev"));
-
 app.use(express.json());
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-  })
-);
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+
+app.get("/", (req, res) => res.send("Welcome User"));
+app.use("/api/auth", authRouter);
+app.use("/api/tasks", taskRouter);
 
 await startDB();
 
-app.get("/", (req, res) => {
-  res.send("Welcome User");
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on PORT ${process.env.PORT || 3000}`);
 });
-
-app.use("/api/auth", authRouter);
-app.use("/api/tasks", taskRouter);
