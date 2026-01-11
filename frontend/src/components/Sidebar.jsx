@@ -3,6 +3,7 @@ import useAuth from "../hooks/useAuth";
 import { NavLink } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
+import imageCompression from "browser-image-compression";
 
 export const Sidebar = () => {
   const { user, logout, updatePfp } = useAuth();
@@ -10,7 +11,7 @@ export const Sidebar = () => {
 
   const handleLogout = () => {
     const audio = new Audio("/caseohban.mp3");
-    audio.play().catch((err) => console.error("Audio playback failed:", err));
+    audio.play().catch(() => {});
 
     logout();
     toast.info("Logged out!");
@@ -19,8 +20,9 @@ export const Sidebar = () => {
   useEffect(() => {
     if (!user) return;
     const audio = new Audio("/caseoh.mp3");
-    audio.play();
-  }, [user]);
+    audio.play().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const navItems = [
     { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard" },
@@ -42,20 +44,34 @@ export const Sidebar = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result;
+    try {
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 500,
+        useWebWorker: true,
+      };
+      const compressedFile = await imageCompression(file, options);
 
-      try {
-        await updatePfp(base64);
-        toast.success("Profile picture updated!");
-      } catch {
-        toast.error("Failed to update profile picture");
-      }
-    };
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result;
 
-    reader.readAsDataURL(file);
+        try {
+          await updatePfp(base64);
+          toast.success("Profile picture updated!");
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to update profile picture");
+        }
+      };
+
+      reader.readAsDataURL(compressedFile);
+    } catch (err) {
+      console.error("Image compression failed:", err);
+      toast.error("Failed to compress image");
+    }
   };
+
   if (!user) return null;
 
   return (

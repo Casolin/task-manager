@@ -44,20 +44,16 @@ export const AuthContextProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updatePfp = async (file) => {
-    if (!file) return;
+  const updatePfp = async (base64File) => {
+    if (!base64File) return;
 
     try {
-      const formData = new FormData();
-      formData.append("pfp", file);
-
-      const response = await updatePfpApi(formData);
-
+      const response = await updatePfpApi(base64File);
       setUser((prev) => ({ ...prev, pfp: response.data.pfp }));
     } catch (err) {
       console.error(
         "Failed to update profile picture:",
-        err.response?.data?.message || err.message
+        err.response?.data?.message
       );
       throw err;
     }

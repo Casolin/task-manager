@@ -12,7 +12,5 @@ export const getProfile = () => {
   return api.get("/api/auth/profile");
 };
 
-export const updatePfpApi = (formData) =>
-  api.patch("/api/auth/user/pfp", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+export const updatePfpApi = (pfpBase64) =>
+  api.patch("/api/auth/user/pfp", { pfp: pfpBase64 });
