@@ -1,7 +1,16 @@
 export const TaskCard = ({ task }) => {
   const maxVisible = 3;
   const assignedUsers = task.assignedUsers || [];
-  const extraUsers = Math.max(assignedUsers.length - maxVisible, 0);
+
+  // Filter out the creator to avoid duplicate avatars
+  const assignedUsersExcludingCreator = assignedUsers.filter(
+    (user) => user?._id !== task.createdBy?._id
+  );
+
+  const extraUsers = Math.max(
+    assignedUsersExcludingCreator.length - maxVisible,
+    0
+  );
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -97,7 +106,7 @@ export const TaskCard = ({ task }) => {
 
       <div className="flex items-center gap-2">
         {task.createdBy && renderAvatar(task.createdBy)}
-        {assignedUsers.slice(0, maxVisible).map(renderAvatar)}
+        {assignedUsersExcludingCreator.slice(0, maxVisible).map(renderAvatar)}
         {extraUsers > 0 && (
           <div className="w-8 h-8 rounded-full bg-[#2b0e15] text-xs font-semibold flex items-center justify-center border-2 border-[#1b0e0f] text-white">
             +{extraUsers}
