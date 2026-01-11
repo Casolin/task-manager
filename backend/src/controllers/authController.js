@@ -75,8 +75,6 @@ export const profile = async (req, res) => {
   }
 };
 
-import User from "../models/User.js";
-
 export const pfpUpdate = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
