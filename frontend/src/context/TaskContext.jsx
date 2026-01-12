@@ -1,5 +1,11 @@
 import { createContext, useState } from "react";
-import { addTask, taskList, taskStats } from "../api/tasks";
+import {
+  addTask,
+  deleteTask,
+  editTask,
+  taskList,
+  taskStats,
+} from "../api/tasks";
 
 const TaskContext = createContext(null);
 
@@ -27,6 +33,7 @@ export const TaskContextProvider = ({ children }) => {
       setLoading(true);
       const response = await taskStats();
       setTaskState(response.data);
+      console.log(response.data);
       return response.data;
     } catch (err) {
       console.error(err);
@@ -49,6 +56,30 @@ export const TaskContextProvider = ({ children }) => {
     }
   };
 
+  const editUserTask = async (taskId, updatedTask) => {
+    try {
+      setLoading(true);
+      const modifiedTask = await editTask(taskId, updatedTask);
+      setTasks((prev) =>
+        prev.map((task) => (task._id !== taskId ? task : modifiedTask))
+      );
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to manage task");
+    }
+  };
+
+  const deleteUserTask = async (taskId) => {
+    try {
+      setLoading(true);
+      await deleteTask(taskId);
+      setTasks((prev) => prev.filter((task) => task._id !== taskId));
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to manage task");
+    }
+  };
+
   return (
     <TaskContext.Provider
       value={{
@@ -57,6 +88,8 @@ export const TaskContextProvider = ({ children }) => {
         getUserTaskStats,
         getUserTaskList,
         addUserTask,
+        editUserTask,
+        deleteUserTask,
         taskState,
         loading,
         error,

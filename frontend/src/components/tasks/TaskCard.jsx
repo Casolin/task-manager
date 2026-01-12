@@ -1,8 +1,9 @@
-export const TaskCard = ({ task }) => {
+import { ManageTaskModal } from "../modals/ManageTaskModal";
+
+export const TaskCard = ({ task, onClick }) => {
   const maxVisible = 3;
   const assignedUsers = task.assignedUsers || [];
 
-  // Filter out the creator to avoid duplicate avatars
   const assignedUsersExcludingCreator = assignedUsers.filter(
     (user) => user?._id !== task.createdBy?._id
   );
@@ -17,7 +18,7 @@ export const TaskCard = ({ task }) => {
       case "High":
         return "bg-red-600 text-white";
       case "Medium":
-        return "bg-yellow-600 text-black";
+        return "bg-yellow-600 text-white";
       case "Low":
         return "bg-green-600 text-white";
       default:
@@ -28,7 +29,7 @@ export const TaskCard = ({ task }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "bg-gray-600 text-white";
+        return "bg-[#f59e0b] text-white";
       case "In-Progress":
         return "bg-[#0362fc] text-white";
       case "Completed":
@@ -38,7 +39,13 @@ export const TaskCard = ({ task }) => {
     }
   };
 
-  const progress = task.progress || 0;
+  const getTaskProgress = () => {
+    if (task.status === "Completed") return 100;
+    if (task.progress != null) return task.progress;
+    return 0;
+  };
+
+  const progress = getTaskProgress();
   const progressBarColor =
     progress === 100
       ? "bg-green-600"
@@ -63,7 +70,10 @@ export const TaskCard = ({ task }) => {
   };
 
   return (
-    <div className="bg-[#1b0a0f] border border-[#2b0e15] rounded-xl p-6 shadow-lg">
+    <div
+      className="bg-[#1b0a0f] border border-[#2b0e15] rounded-xl p-6 shadow-lg"
+      onClick={onClick}
+    >
       <div className="flex justify-between text-sm mb-3">
         <span
           className={`px-2 py-1 rounded-full ${getStatusColor(task.status)}`}

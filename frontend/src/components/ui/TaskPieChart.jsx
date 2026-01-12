@@ -16,11 +16,9 @@ export const TaskPieChart = ({ stats }) => {
     { name: "Completed", value: stats.completed },
   ];
 
-  const total = stats.total;
-
   return (
     <div
-      className="w-full h-[500px] rounded-3xl p-6 shadow-2xl"
+      className="w-full h-[400px] rounded-3xl p-6 shadow-2xl"
       style={{ backgroundColor: "#1b0a0f" }}
     >
       <ResponsiveContainer width="100%" height="100%">
@@ -31,8 +29,8 @@ export const TaskPieChart = ({ stats }) => {
             nameKey="name"
             cx="50%"
             cy="50%"
-            innerRadius={90}
-            outerRadius={140}
+            innerRadius="80%"
+            outerRadius="100%"
             stroke="#1b0a0f"
             strokeWidth={3}
           >
@@ -51,12 +49,14 @@ export const TaskPieChart = ({ stats }) => {
           <Legend
             verticalAlign="bottom"
             height={36}
-            wrapperStyle={{ color: "#fff", fontWeight: "bold" }}
+            wrapperStyle={{
+              color: "#fff",
+              fontWeight: "bold",
+              fontSize: "13px",
+            }}
             iconType="circle"
-            formatter={(value, entry) => {
-              const { payload } = entry;
-              const percent = ((payload.value / total) * 100).toFixed(0);
-              return `${value} (${percent}%)`;
+            formatter={(value) => {
+              return `${value}`;
             }}
           />
         </PieChart>

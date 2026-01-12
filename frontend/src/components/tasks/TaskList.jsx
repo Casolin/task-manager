@@ -3,22 +3,26 @@ import useTasks from "../../hooks/useTasks";
 import { TaskCard } from "./TaskCard";
 import { Plus, RefreshCw } from "lucide-react";
 import { AddTaskModal } from "../modals/AddTaskModal";
-import useAuth from "../../hooks/useAuth";
+import { ManageTaskModal } from "../modals/ManageTaskModal";
 
 export const TaskList = () => {
   const { tasks, getUserTaskList } = useTasks();
-  const { user } = useAuth();
   const [filter, setFilter] = useState("All");
 
-  console.log(user);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getUserTaskList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredTasks =
     filter === "All" ? tasks : tasks.filter((task) => task.status === filter);
+
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#12070b] text-white px-6 py-6 container">
@@ -45,7 +49,6 @@ export const TaskList = () => {
                 </button>
               }
             />
-
             <button
               onClick={getUserTaskList}
               className="bg-[#0362fc] text-white p-2 rounded-full hover:bg-blue-700 transition cursor-pointer"
@@ -54,11 +57,25 @@ export const TaskList = () => {
             </button>
           </div>
         </div>
+
+        {selectedTask && (
+          <ManageTaskModal
+            open={isModalOpen}
+            setOpen={setIsModalOpen}
+            task={selectedTask}
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTasks.length !== 0 ? (
-          filteredTasks.map((task) => <TaskCard key={task._id} task={task} />)
+          filteredTasks.map((task) => (
+            <TaskCard
+              key={task._id}
+              task={task}
+              onClick={() => handleTaskClick(task)}
+            />
+          ))
         ) : (
           <p className="text-gray-400">No Tasks</p>
         )}

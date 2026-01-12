@@ -74,16 +74,14 @@ export const addTask = async (req, res) => {
 export const editTask = async (req, res) => {
   try {
     const id = req.params.id;
-    const { title, description, assignedTo, status, priority, tags, order } =
-      req.body;
+    const { title, description, status, priority, tags, dueDate } = req.body;
     const updatedTask = {
       title,
       description,
-      assignedTo,
       status,
       priority,
       tags,
-      order,
+      dueDate,
     };
     const task = await Task.findOneAndUpdate(
       { _id: id, createdBy: req.user.id },
@@ -129,11 +127,26 @@ export const getTaskStats = async (req, res) => {
     createdBy: userId,
     status: "In-Progress",
   });
+  const lowTaskPriority = await Task.countDocuments({
+    createdBy: userId,
+    priority: "Low",
+  });
+  const mediumTaskPriority = await Task.countDocuments({
+    createdBy: userId,
+    priority: "Medium",
+  });
+  const highTaskPriority = await Task.countDocuments({
+    createdBy: userId,
+    priority: "High",
+  });
 
   res.json({
     total,
     completed,
     pending,
     inProgress,
+    lowTaskPriority,
+    mediumTaskPriority,
+    highTaskPriority,
   });
 };
