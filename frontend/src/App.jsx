@@ -13,6 +13,7 @@ import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import { Dashboard } from "./pages/dashboard/Dashboard";
 import { TaskList } from "./components/tasks/TaskList";
+import { UsersTaskList } from "./components/tasks/UsersTaskList";
 
 import "./styles/index.css";
 
@@ -52,6 +53,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TaskList />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="list"
+            element={
+              <ProtectedRoute>
+                <UsersTaskList />
               </ProtectedRoute>
             }
           ></Route>

@@ -4,6 +4,10 @@ export const taskList = () => {
   return api.get("/api/tasks");
 };
 
+export const usersTaskList = () => {
+  return api.get("/api/tasks/list");
+};
+
 export const taskStats = () => {
   return api.get("/api/tasks/stats");
 };

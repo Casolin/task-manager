@@ -4,6 +4,7 @@ import {
   deleteTask,
   editTask,
   taskList,
+  usersTaskList,
   taskStats,
 } from "../api/tasks";
 
@@ -11,6 +12,7 @@ const TaskContext = createContext(null);
 
 export const TaskContextProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [usersTasks, setUsersTasks] = useState([]);
   const [taskState, setTaskState] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -20,6 +22,19 @@ export const TaskContextProvider = ({ children }) => {
       setLoading(true);
       const response = await taskList();
       setTasks(response.data);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to fetch tasks");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getUsersTaskList = async () => {
+    try {
+      setLoading(true);
+      const response = await usersTaskList();
+      setUsersTasks(response.data);
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to fetch tasks");
@@ -84,9 +99,11 @@ export const TaskContextProvider = ({ children }) => {
     <TaskContext.Provider
       value={{
         tasks,
+        usersTasks,
         setTasks,
         getUserTaskStats,
         getUserTaskList,
+        getUsersTaskList,
         addUserTask,
         editUserTask,
         deleteUserTask,

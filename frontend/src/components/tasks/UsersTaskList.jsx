@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
 import useTasks from "../../hooks/useTasks";
 import { TaskCard } from "./TaskCard";
-import { Plus, RefreshCw } from "lucide-react";
-import { AddTaskModal } from "../modals/AddTaskModal";
+import { RefreshCw } from "lucide-react";
 import { ManageTaskModal } from "../modals/ManageTaskModal";
 
-export const TaskList = () => {
-  const { tasks, getUserTaskList } = useTasks();
+export const UsersTaskList = () => {
+  const { usersTasks, getUsersTaskList } = useTasks();
   const [filter, setFilter] = useState("All");
 
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    getUserTaskList();
+    getUsersTaskList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredTasks =
-    filter === "All" ? tasks : tasks.filter((task) => task.status === filter);
+    filter === "All"
+      ? usersTasks
+      : usersTasks.filter((task) => task.status === filter);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
@@ -43,15 +44,8 @@ export const TaskList = () => {
           </select>
 
           <div className="flex items-center gap-4 mt-2 sm:mt-0">
-            <AddTaskModal
-              trigger={
-                <button className="bg-[#0362fc] text-white p-2 rounded-full hover:bg-blue-700 transition cursor-pointer">
-                  <Plus size={20} />
-                </button>
-              }
-            />
             <button
-              onClick={getUserTaskList}
+              onClick={getUsersTaskList}
               className="bg-[#0362fc] text-white p-2 rounded-full hover:bg-blue-700 transition cursor-pointer"
             >
               <RefreshCw size={20} />

@@ -31,7 +31,7 @@ export const Sidebar = () => {
 
   if (user?.role === "admin") {
     navItems.push(
-      { name: "All Tasks", icon: <FileText size={20} />, path: "/all-tasks" },
+      { name: "All Tasks", icon: <FileText size={20} />, path: "/list" },
       { name: "Team Members", icon: <Users size={20} />, path: "/team" }
     );
   }
