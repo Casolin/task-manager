@@ -55,7 +55,7 @@ export const Register = () => {
   return (
     <div
       className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-cover bg-center"
-      style={{ backgroundImage: "url('/authentification.jpg')" }}
+      style={{ backgroundImage: "url('/authentication.jpg')" }}
     >
       {/* Left welcome panel */}
       <div className="hidden lg:flex flex-col justify-center px-24 bg-gradient-to-r from-[#1b0a0f]/80 to-transparent">
