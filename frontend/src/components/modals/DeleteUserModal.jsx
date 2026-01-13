@@ -17,11 +17,11 @@ export const DeleteUserModal = ({ open, setOpen, onConfirm, userName }) => {
               </button>
             </Dialog.Close>
           </div>
-          <p className="mt-2 text-sm text-slate-400">
+          <Dialog.Description className="mt-2 text-sm text-slate-400">
             Are you sure you want to delete{" "}
             <span className="font-semibold">{userName}</span>? This action
             cannot be undone.
-          </p>
+          </Dialog.Description>
 
           <div className="mt-4 flex justify-end gap-3">
             <Dialog.Close className="px-4 py-2 bg-slate-700 rounded hover:bg-slate-600 transition cursor-pointer">
