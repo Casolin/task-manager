@@ -13,7 +13,7 @@ export const UserContextProvider = ({ children }) => {
     if (!user) return;
     try {
       setLoading(true);
-      const res = await getUsers(user.token);
+      const res = await getUsers(user);
       setUsers(res.data);
     } catch (err) {
       console.error(err.message);
@@ -23,10 +23,10 @@ export const UserContextProvider = ({ children }) => {
   };
 
   const deleteUser = async (userId) => {
-    if (!user?.token) return;
+    if (!user) return;
     try {
       setLoading(true);
-      await deleteUserApi(userId, user.token);
+      await deleteUserApi(userId);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
       const msg = err?.response?.data?.message;
