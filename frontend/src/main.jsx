@@ -9,11 +9,11 @@ import { UserContextProvider } from "./context/UserContext.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthContextProvider>
-      <TaskContextProvider>
-        <UserContextProvider>
+      <UserContextProvider>
+        <TaskContextProvider>
           <App />
-        </UserContextProvider>
-      </TaskContextProvider>
+        </TaskContextProvider>
+      </UserContextProvider>
     </AuthContextProvider>
   </StrictMode>
 );

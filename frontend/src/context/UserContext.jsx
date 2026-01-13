@@ -1,21 +1,22 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import { getUsers, deleteUser as deleteUserApi } from "../api/users";
 import { toast } from "react-toastify";
+import useAuth from "../hooks/useAuth.js";
 
 const UserContext = createContext(null);
 
 export const UserContextProvider = ({ children }) => {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchUsers = async () => {
+    if (!user) return;
     try {
       setLoading(true);
-      const res = await getUsers();
+      const res = await getUsers(user.token);
       setUsers(res.data);
     } catch (err) {
-      setError(err.message || "Failed to fetch users");
       toast.error(err.message || "Failed to fetch users");
     } finally {
       setLoading(false);
@@ -23,32 +24,20 @@ export const UserContextProvider = ({ children }) => {
   };
 
   const deleteUser = async (userId) => {
+    if (!user?.token) return;
     try {
       setLoading(true);
-      await deleteUserApi(userId);
+      await deleteUserApi(userId, user.token);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
-      setError(err.message || "Failed to delete user");
       toast.error(err.message || "Failed to delete user");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   return (
-    <UserContext.Provider
-      value={{
-        users,
-        loading,
-        error,
-        fetchUsers,
-        deleteUser,
-      }}
-    >
+    <UserContext.Provider value={{ users, loading, fetchUsers, deleteUser }}>
       {children}
     </UserContext.Provider>
   );

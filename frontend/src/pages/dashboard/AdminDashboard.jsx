@@ -1,15 +1,22 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import UserContext from "../../context/UserContext";
 import useAuth from "../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { DeleteUserModal } from "../../components/modals/DeleteUserModal";
 
 export const AdminDashboard = () => {
-  const { user: loggedInUser } = useAuth();
-  const { users, deleteUser, loading } = useContext(UserContext);
+  const { user } = useAuth();
+  const { users, deleteUser, fetchUsers, loading } = useContext(UserContext);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleDeleteClick = (user) => {
     setSelectedUser(user);
@@ -34,8 +41,8 @@ export const AdminDashboard = () => {
         <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
         <div className="text-right text-slate-300">
           <p className="text-sm">Logged in as:</p>
-          <p className="font-semibold text-white">{loggedInUser.username}</p>
-          <p className="text-xs capitalize">{loggedInUser.role}</p>
+          <p className="font-semibold text-white">{user?.username}</p>
+          <p className="text-xs capitalize">{user?.role}</p>
         </div>
       </div>
 
@@ -48,7 +55,7 @@ export const AdminDashboard = () => {
               key={u._id}
               className={`p-4 rounded-lg shadow-lg transition
                   ${
-                    u._id === loggedInUser._id
+                    u._id === user._id
                       ? "bg-blue-900"
                       : "bg-slate-800 hover:bg-slate-700"
                   }
@@ -70,15 +77,14 @@ export const AdminDashboard = () => {
                     {u.role}
                   </span>
                 </div>
-                {loggedInUser.role === "admin" &&
-                  loggedInUser._id !== u._id && (
-                    <button
-                      onClick={() => handleDeleteClick(u)}
-                      className="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white transition cursor-pointer"
-                    >
-                      Delete
-                    </button>
-                  )}
+                {user?.role === "admin" && user._id !== u._id && (
+                  <button
+                    onClick={() => handleDeleteClick(u)}
+                    className="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white transition cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))
