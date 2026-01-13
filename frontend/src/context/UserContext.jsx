@@ -24,10 +24,10 @@ export const UserContextProvider = ({ children }) => {
   };
 
   const deleteUser = async (userId) => {
-    if (!user?.token) return;
+    if (!user) return;
     try {
       setLoading(true);
-      await deleteUserApi(userId, user.token);
+      await deleteUserApi(userId);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
       toast.error(err.message || "Failed to delete user");

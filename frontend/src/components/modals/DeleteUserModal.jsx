@@ -18,7 +18,7 @@ export const DeleteUserModal = ({ open, setOpen, onConfirm, userName }) => {
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-2 text-sm text-slate-400">
-            Are you sure you want to delete{" "}
+            Are you sure you want to delete
             <span className="font-semibold">{userName}</span>? This action
             cannot be undone.
           </Dialog.Description>
