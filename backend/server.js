@@ -5,6 +5,7 @@ import "dotenv/config";
 import startDB from "./src/config/db.js";
 import authRouter from "./src/routes/authRoutes.js";
 import taskRouter from "./src/routes/taskRoutes.js";
+import userRouter from "./src/routes/userRoutes.js";
 import path from "path";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.get("/", (req, res) => res.send("Welcome User"));
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", taskRouter);
+app.use("/api/users", userRouter);
 
 await startDB();
 

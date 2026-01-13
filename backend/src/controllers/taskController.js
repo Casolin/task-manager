@@ -2,7 +2,9 @@ import Task from "../models/Task.js";
 
 export const taskList = async (req, res) => {
   try {
-    const tasks = await Task.find({ createdBy: req.user.id })
+    const tasks = await Task.find({
+      $or: [{ createdBy: req.user.id }, { assignedUsers: req.user.id }],
+    })
       .populate("createdBy", "pfp username email")
       .populate("assignedUsers", "pfp username email");
 
@@ -123,7 +125,10 @@ export const editTask = async (req, res) => {
       });
     } else {
       task = await Task.findOneAndUpdate(
-        { _id: id, createdBy: req.user.id },
+        {
+          _id: id,
+          $or: [{ createdBy: req.user.id }, { assignedUsers: req.user.id }],
+        },
         updatedTask,
         { new: true, runValidators: true }
       );
@@ -150,7 +155,7 @@ export const deleteTask = async (req, res) => {
     } else {
       task = await Task.findOneAndDelete({
         _id: id,
-        createdBy: req.user.id,
+        $or: [{ createdBy: req.user.id }, { assignedUsers: req.user.id }],
       });
     }
 
@@ -164,29 +169,32 @@ export const deleteTask = async (req, res) => {
 
 export const getTaskStats = async (req, res) => {
   const userId = req.user.id;
-  const total = await Task.countDocuments({ createdBy: userId });
+  const total = await Task.countDocuments({
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
+  });
   const completed = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     status: "Completed",
   });
   const pending = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     status: "Pending",
   });
   const inProgress = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     status: "In-Progress",
   });
+
   const lowTaskPriority = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     priority: "Low",
   });
   const mediumTaskPriority = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     priority: "Medium",
   });
   const highTaskPriority = await Task.countDocuments({
-    createdBy: userId,
+    $or: [{ createdBy: userId }, { assignedUsers: userId }],
     priority: "High",
   });
 

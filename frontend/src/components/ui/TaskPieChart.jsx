@@ -17,10 +17,7 @@ export const TaskPieChart = ({ stats }) => {
   ];
 
   return (
-    <div
-      className="w-full h-[400px] rounded-3xl p-6 shadow-2xl"
-      style={{ backgroundColor: "#1b0a0f" }}
-    >
+    <div className="w-full h-[400px] rounded-3xl p-6 shadow-xl bg-slate-900 border border-slate-800">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -31,33 +28,34 @@ export const TaskPieChart = ({ stats }) => {
             cy="50%"
             innerRadius="80%"
             outerRadius="100%"
-            stroke="#1b0a0f"
+            stroke="#1e1e1e"
             strokeWidth={3}
           >
-            {data.map((entry, index) => (
+            {data.map((_, index) => (
               <Cell
                 key={index}
-                fill={["#f59e0b", "#3b82f6", "#16a34a"][index % 3]}
+                fill={["#f59e0b", "#3b82f6", "#22c55e"][index % 3]}
               />
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{ backgroundColor: "#2b1219", borderRadius: "6px" }}
-            itemStyle={{ color: "#fff" }}
+            contentStyle={{
+              backgroundColor: "#020617",
+              border: "1px solid #1e293b",
+              borderRadius: "8px",
+            }}
+            itemStyle={{ color: "#e5e7eb" }}
             formatter={(value) => [`${value} tasks`, "Tasks"]}
           />
           <Legend
             verticalAlign="bottom"
             height={36}
             wrapperStyle={{
-              color: "#fff",
-              fontWeight: "bold",
+              color: "#e5e7eb",
+              fontWeight: 500,
               fontSize: "13px",
             }}
             iconType="circle"
-            formatter={(value) => {
-              return `${value}`;
-            }}
           />
         </PieChart>
       </ResponsiveContainer>

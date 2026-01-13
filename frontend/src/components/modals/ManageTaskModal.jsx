@@ -28,7 +28,6 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
           dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
         });
       };
-
       populateForm();
     }
   }, [task, open]);
@@ -45,19 +44,16 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
     }
 
     try {
-      const payload = {
+      await editUserTask(task._id, {
         ...form,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
         dueDate: form.dueDate,
-      };
-
-      await editUserTask(task._id, payload);
+      });
       getUserTaskList();
       toast.success("Task updated successfully!");
       setOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Failed to update task");
+    } catch {
+      toast.error("Failed to update task");
     }
   };
 
@@ -67,9 +63,8 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
       getUserTaskList();
       toast.success("Task deleted successfully!");
       setOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Failed to delete task");
+    } catch {
+      toast.error("Failed to delete task");
     }
   };
 
@@ -78,27 +73,27 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1b0a0f] p-8 rounded-xl w-full max-w-lg text-white shadow-lg space-y-6 overflow-y-auto max-h-[90vh]">
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-8 rounded-xl w-full max-w-lg text-white shadow-xl space-y-6 overflow-y-auto max-h-[90vh] border border-slate-800">
           <div className="flex justify-between items-start">
             <div>
-              <Dialog.Title className="text-2xl font-bold">
+              <Dialog.Title className="text-xl font-semibold">
                 Edit Task
               </Dialog.Title>
-              <Dialog.Description className="text-gray-400 text-sm mt-1">
+              <Dialog.Description className="text-slate-400 text-sm mt-1">
                 Modify your task details below
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
-              <button className="text-gray-400 hover:text-white cursor-pointer">
-                <X size={24} />
+              <button className="text-slate-400 hover:text-white cursor-pointer">
+                <X size={22} />
               </button>
             </Dialog.Close>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="text-gray-300 text-sm mb-1 block">
+              <label className="text-slate-400 text-sm mb-1 block">
                 Title *
               </label>
               <input
@@ -106,32 +101,32 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm mb-1 block">
+              <label className="text-slate-400 text-sm mb-1 block">
                 Description
               </label>
               <textarea
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-gray-300 text-sm mb-1 block">
+                <label className="text-slate-400 text-sm mb-1 block">
                   Status
                 </label>
                 <select
                   name="status"
                   value={form.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="Pending">Pending</option>
                   <option value="In-Progress">In-Progress</option>
@@ -140,14 +135,14 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
               </div>
 
               <div>
-                <label className="text-gray-300 text-sm mb-1 block">
+                <label className="text-slate-400 text-sm mb-1 block">
                   Priority
                 </label>
                 <select
                   name="priority"
                   value={form.priority}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
@@ -158,19 +153,22 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-gray-300 text-sm mb-1 block">Tags</label>
+                <label className="text-slate-400 text-sm mb-1 block">
+                  Tags
+                </label>
                 <input
                   type="text"
                   name="tags"
                   placeholder="tag1, tag2"
+                  autoComplete="off"
                   value={form.tags}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="text-gray-300 text-sm mb-1 block">
+                <label className="text-slate-400 text-sm mb-1 block">
                   Due Date
                 </label>
                 <input
@@ -178,7 +176,7 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
                   name="dueDate"
                   value={form.dueDate}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-[#2b0e15] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#0362fc]"
+                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -191,7 +189,7 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
             >
               Delete Task
             </button>
-            <Dialog.Close className="px-5 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition cursor-pointer">
+            <Dialog.Close className="px-5 py-2 bg-slate-700 rounded-lg hover:bg-slate-600 transition cursor-pointer">
               Cancel
             </Dialog.Close>
             <button

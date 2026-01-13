@@ -57,33 +57,36 @@ export const Register = () => {
       className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-cover bg-center"
       style={{ backgroundImage: "url('/authentification.jpg')" }}
     >
+      {/* Left welcome panel */}
       <div className="hidden lg:flex flex-col justify-center px-24 bg-gradient-to-r from-[#1b0a0f]/80 to-transparent">
-        <h1 className="text-6xl font-semibold text-[#f5eaea] leading-tight">
-          Get started
+        <h1 className="text-6xl font-bold text-white leading-tight">
+          Get Started
         </h1>
-        <p className="mt-8 text-lg text-[#e6c9c9] max-w-md">
+        <p className="mt-6 text-lg text-blue-200 max-w-md">
           Create your account and start your journey in a space crafted for calm
           focus and clarity.
         </p>
       </div>
 
+      {/* Register form */}
       <div className="flex items-center justify-center px-6">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-sm bg-[#f9f3f3] rounded-3xl px-12 py-14 shadow-[0_40px_100px_rgba(0,0,0,0.45)]"
+          className="w-full max-w-sm bg-slate-900/90 backdrop-blur-sm rounded-3xl px-12 py-14 shadow-lg border border-blue-700"
         >
-          <h2 className="text-3xl font-semibold text-[#2b0e15] mb-12">
-            Create account
+          <h2 className="text-3xl font-bold text-white mb-10 text-center">
+            Create Account
           </h2>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             <input
               type="text"
               name="username"
               value={user.username}
               onChange={handleChange}
               placeholder="Username"
-              className="w-full bg-transparent border-b border-[#b07a83] py-2 text-[#2b0e15] placeholder-[#b07a83] focus:outline-none focus:border-[#2b0e15]"
+              autoComplete="off"
+              className="w-full bg-transparent border-b border-blue-600 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-blue-400 transition"
             />
 
             <input
@@ -92,7 +95,8 @@ export const Register = () => {
               value={user.email}
               onChange={handleChange}
               placeholder="Email"
-              className="w-full bg-transparent border-b border-[#b07a83] py-2 text-[#2b0e15] placeholder-[#b07a83] focus:outline-none focus:border-[#2b0e15]"
+              autoComplete="off"
+              className="w-full bg-transparent border-b border-blue-600 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-blue-400 transition"
             />
 
             <input
@@ -101,7 +105,7 @@ export const Register = () => {
               value={user.password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full bg-transparent border-b border-[#b07a83] py-2 text-[#2b0e15] placeholder-[#b07a83] focus:outline-none focus:border-[#2b0e15]"
+              className="w-full bg-transparent border-b border-blue-600 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-blue-400 transition"
             />
 
             <input
@@ -109,22 +113,22 @@ export const Register = () => {
               name="confirmpassword"
               value={user.confirmpassword}
               onChange={handleChange}
-              placeholder="Confirm password"
-              className="w-full bg-transparent border-b border-[#b07a83] py-2 text-[#2b0e15] placeholder-[#b07a83] focus:outline-none focus:border-[#2b0e15]"
+              placeholder="Confirm Password"
+              className="w-full bg-transparent border-b border-blue-600 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-blue-400 transition"
             />
           </div>
 
           <button
             type="submit"
-            className="mt-14 w-full rounded-full bg-[#2b0e15] py-3 text-[#f9f3f3] font-medium hover:bg-[#1f0a10] transition cursor-pointer"
+            className="mt-12 w-full rounded-full bg-blue-600 py-3 text-white font-semibold hover:bg-blue-500 transition cursor-pointer"
           >
             Register
           </button>
 
-          <p className="mt-8 text-center text-sm text-[#6e3a43]">
+          <p className="mt-6 text-center text-sm text-blue-200">
             Already have an account?{" "}
             <span
-              className="font-medium hover:underline cursor-pointer"
+              className="font-semibold hover:underline cursor-pointer text-blue-400"
               onClick={() => navigate("/login")}
             >
               Login

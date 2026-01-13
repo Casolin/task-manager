@@ -22,6 +22,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Tabs from "@radix-ui/react-tabs";
 
 import { DashboardContent } from "./pages/dashboard/DashboardContent";
+import { AdminDashboard } from "./pages/dashboard/AdminDashboard";
 
 // import { motion } from "framer-motion";
 
@@ -61,6 +62,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UsersTaskList />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             }
           ></Route>

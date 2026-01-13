@@ -12,7 +12,6 @@ export const Sidebar = () => {
   const handleLogout = () => {
     const audio = new Audio("/caseohban.mp3");
     audio.play().catch(() => {});
-
     logout();
     toast.info("Logged out!");
   };
@@ -32,12 +31,12 @@ export const Sidebar = () => {
   if (user?.role === "admin") {
     navItems.push(
       { name: "All Tasks", icon: <FileText size={20} />, path: "/list" },
-      { name: "Team Members", icon: <Users size={20} />, path: "/team" }
+      { name: "Team Members", icon: <Users size={20} />, path: "/users" }
     );
   }
 
   const handleAvatarClick = () => {
-    if (fileInputRef.current) fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = async (e) => {
@@ -45,42 +44,33 @@ export const Sidebar = () => {
     if (!file) return;
 
     try {
-      const options = {
+      const compressedFile = await imageCompression(file, {
         maxSizeMB: 1,
         maxWidthOrHeight: 500,
         useWebWorker: true,
-      };
-      const compressedFile = await imageCompression(file, options);
+      });
 
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64 = reader.result;
-
-        try {
-          await updatePfp(base64);
-          toast.success("Profile picture updated!");
-        } catch (err) {
-          console.error(err);
-          toast.error("Failed to update profile picture");
-        }
+        await updatePfp(reader.result);
+        toast.success("Profile picture updated!");
       };
 
       reader.readAsDataURL(compressedFile);
-    } catch (err) {
-      console.error("Image compression failed:", err);
-      toast.error("Failed to compress image");
+    } catch {
+      toast.error("Failed to update profile picture");
     }
   };
 
   if (!user) return null;
 
   return (
-    <div className="h-screen w-64 bg-[#1b0a0f] text-white flex flex-col justify-between">
+    <div className="h-screen w-64 bg-slate-900 text-white flex flex-col justify-between border-r border-slate-800">
       <div className="p-6 text-center">
         <div
-          className="w-[92px] h-[92px] mx-auto mb-2 rounded-full overflow-hidden cursor-pointer border-2 border-gray-300 hover:ring-2 hover:ring-[#0362fc] transition-all duration-200"
           onClick={handleAvatarClick}
-          title="Click to change profile picture"
+          className="w-[92px] h-[92px] mx-auto mb-3 rounded-full overflow-hidden cursor-pointer
+          border-2 border-slate-600 hover:ring-2 hover:ring-blue-500 transition"
         >
           <img
             src={user.pfp || "/default-avatar.png"}
@@ -98,26 +88,26 @@ export const Sidebar = () => {
         />
 
         {user.role === "admin" && (
-          <div className="bg-[#0362fc] text-white text-xs font-semibold px-2 py-1 rounded-full mb-1 inline-block">
+          <span className="inline-block mb-2 text-xs font-semibold px-2 py-1 rounded-full bg-blue-600">
             Admin
-          </div>
+          </span>
         )}
 
         <h2 className="font-semibold text-lg">{user.username}</h2>
-        <p className="text-sm text-gray-300">{user.email}</p>
+        <p className="text-sm text-slate-400">{user.email}</p>
       </div>
 
-      <ul className="flex-1 mt-6 space-y-2">
+      <ul className="flex-1 mt-4 space-y-1">
         {navItems.map((item) => (
           <li key={item.name}>
             <NavLink
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 w-full px-6 py-3 transition 
+                `flex items-center gap-3 px-6 py-3 transition
                 ${
                   isActive
-                    ? "bg-[#2b0e15] border-l-4 border-[#0362fc]"
-                    : "hover:bg-[#2b0e15]"
+                    ? "bg-slate-800 border-l-4 border-blue-500"
+                    : "hover:bg-slate-800"
                 }`
               }
             >
@@ -131,14 +121,14 @@ export const Sidebar = () => {
       <img
         src="/logo.png"
         alt="Logo"
-        className="w-30 h-30 object-cover rounded-full mx-auto mb-4"
+        className="w-24 h-24 object-cover rounded-full mx-auto my-4 opacity-80"
       />
 
-      <div className="px-0 py-4 border-t border-[#2b0e15]">
+      <div className="border-t border-slate-800">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-6 py-3 rounded-r-lg transition cursor-pointer
-               hover:bg-[#611000] hover:border-l-4 hover:border-[#0362fc] text-white"
+          className="flex items-center gap-3 w-full px-6 py-3 transition cursor-pointer
+          hover:bg-red-600/20 hover:border-l-4 hover:border-red-500"
         >
           <LogOut size={20} />
           <span>Logout</span>
