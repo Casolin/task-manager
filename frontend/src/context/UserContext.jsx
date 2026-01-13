@@ -1,6 +1,5 @@
 import { createContext, useState } from "react";
 import { getUsers, deleteUser as deleteUserApi } from "../api/users";
-import { toast } from "react-toastify";
 import useAuth from "../hooks/useAuth.js";
 
 const UserContext = createContext(null);
@@ -17,20 +16,21 @@ export const UserContextProvider = ({ children }) => {
       const res = await getUsers(user.token);
       setUsers(res.data);
     } catch (err) {
-      toast.error(err.message || "Failed to fetch users");
+      console.error(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const deleteUser = async (userId) => {
-    if (!user) return;
+    if (!user?.token) return;
     try {
       setLoading(true);
-      await deleteUserApi(userId);
+      await deleteUserApi(userId, user.token);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
-      toast.error(err.message || "Failed to delete user");
+      const msg = err?.response?.data?.message;
+      console.error(msg);
     } finally {
       setLoading(false);
     }
