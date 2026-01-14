@@ -27,6 +27,7 @@ export const AdminDashboard = () => {
     if (!selectedUser) return;
     try {
       await deleteUser(selectedUser._id);
+      fetchUsers();
       toast.success("User deleted successfully");
     } catch (err) {
       toast.error(err.message || "Failed to delete user");

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import useTasks from "../../hooks/useTasks";
 import useAuth from "../../hooks/useAuth";
 import { toast } from "react-toastify";
@@ -8,7 +8,8 @@ import { getUsers } from "../../api/users";
 
 export const ManageTaskModal = ({ task, open, setOpen }) => {
   const { user } = useAuth();
-  const { editUserTask, deleteUserTask, getUserTaskList } = useTasks();
+  const { editUserTask, deleteUserTask, getUserTaskList, getUsersTaskList } =
+    useTasks();
 
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
@@ -23,25 +24,34 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
 
   useEffect(() => {
     if (open && user?.role === "admin") {
-      getUsers().then((res) => setUsers(res.data));
+      const fetchUsers = async () => {
+        try {
+          const res = await getUsers();
+          setUsers(res.data);
+        } catch (err) {
+          toast.error(err.message || "Failed to load users");
+        }
+      };
+      fetchUsers();
     }
   }, [open, user]);
 
   useEffect(() => {
-    if (task && open) {
-      const editForm = () => {
-        setForm({
-          title: task.title || "",
-          description: task.description || "",
-          status: task.status || "Pending",
-          priority: task.priority || "Medium",
-          tags: task.tags?.join(",") || "",
-          dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
-          assignedUsers: task.assignedUsers?.map((u) => u._id) || [],
-        });
-      };
-      editForm();
-    }
+    if (!task || !open) return;
+    const editForm = () => {
+      setForm({
+        title: task.title || "",
+        description: task.description || "",
+        status: task.status || "Pending",
+        priority: task.priority || "Medium",
+        tags: task.tags?.join(",") || "",
+        dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
+        assignedUsers: Array.isArray(task.assignedUsers)
+          ? task.assignedUsers.map((u) => (typeof u === "string" ? u : u._id))
+          : [],
+      });
+    };
+    editForm();
   }, [task, open]);
 
   const handleChange = (e) => {
@@ -49,12 +59,19 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleUser = (userId) => {
+  const addUser = (userId) => {
+    if (!form.assignedUsers.includes(userId)) {
+      setForm((prev) => ({
+        ...prev,
+        assignedUsers: [...prev.assignedUsers, userId],
+      }));
+    }
+  };
+
+  const removeUser = (userId) => {
     setForm((prev) => ({
       ...prev,
-      assignedUsers: prev.assignedUsers.includes(userId)
-        ? prev.assignedUsers.filter((id) => id !== userId)
-        : [...prev.assignedUsers, userId],
+      assignedUsers: prev.assignedUsers.filter((id) => id !== userId),
     }));
   };
 
@@ -65,18 +82,15 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
     }
 
     try {
-      const payload = {
+      await editUserTask(task._id, {
         ...form,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
         assignedUsers:
-          form.assignedUsers.length > 0
-            ? form.assignedUsers
-            : [task.createdBy || user?._id],
-      };
-
-      await editUserTask(task._id, payload);
+          form.assignedUsers.length > 0 ? form.assignedUsers : [user?._id],
+      });
 
       getUserTaskList();
+      getUsersTaskList();
       toast.success("Task updated successfully!");
       setOpen(false);
     } catch {
@@ -88,6 +102,7 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
     try {
       await deleteUserTask(task._id);
       getUserTaskList();
+      getUsersTaskList();
       toast.success("Task deleted successfully!");
       setOpen(false);
     } catch {
@@ -112,12 +127,13 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
-              <button className="text-slate-400 hover:text-white">
+              <button className="text-slate-400 hover:text-white cursor-pointer">
                 <X size={22} />
               </button>
             </Dialog.Close>
           </div>
 
+          {/* Task fields */}
           <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="text-slate-400 text-sm mb-1 block">
@@ -177,29 +193,54 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
               </div>
             </div>
 
+            {/* Assign Users */}
             {user?.role === "admin" && (
               <div>
                 <label className="text-slate-400 text-sm mb-2 block">
                   Assigned Users
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-slate-800 rounded-lg p-2">
+
+                {/* Assigned users list */}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {form.assignedUsers.map((userId) => {
+                    const u = users.find((usr) => usr._id === userId);
+                    if (!u) return null;
+                    return (
+                      <div
+                        key={userId}
+                        className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded"
+                      >
+                        <span>{u.username}</span>
+                        <X
+                          size={14}
+                          className="cursor-pointer text-red-400 hover:text-red-200"
+                          onClick={() => removeUser(userId)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Users to add */}
+                <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border border-slate-800 rounded-lg p-2">
                   {users.map((u) => (
-                    <label
+                    <div
                       key={u._id}
-                      className="flex items-center gap-2 bg-slate-800 px-3 py-2 rounded cursor-pointer hover:bg-slate-700"
+                      className="flex justify-between items-center bg-slate-800 px-3 py-2 rounded cursor-pointer hover:bg-slate-700"
                     >
-                      <input
-                        type="checkbox"
-                        checked={form.assignedUsers.includes(u._id)}
-                        onChange={() => toggleUser(u._id)}
-                      />
                       <span>{u.username}</span>
-                    </label>
+                      <Plus
+                        size={16}
+                        className="text-green-400 hover:text-green-200 cursor-pointer"
+                        onClick={() => addUser(u._id)}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Tags & Due date */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">
@@ -228,19 +269,20 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex justify-end gap-3 mt-6">
             <button
               onClick={handleDeleteTask}
-              className="px-5 py-2 bg-red-600 rounded-lg"
+              className="px-5 py-2 bg-red-600 rounded-lg cursor-pointer"
             >
               Delete Task
             </button>
-            <Dialog.Close className="px-5 py-2 bg-slate-700 rounded-lg">
+            <Dialog.Close className="px-5 py-2 bg-slate-700 rounded-lg cursor-pointer">
               Cancel
             </Dialog.Close>
             <button
               onClick={handleSaveTask}
-              className="px-5 py-2 bg-green-600 rounded-lg"
+              className="px-5 py-2 bg-green-600 rounded-lg cursor-pointer"
             >
               Save Changes
             </button>

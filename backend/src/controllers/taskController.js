@@ -113,8 +113,24 @@ export const editTask = async (req, res) => {
   try {
     console.log(req.user);
     const id = req.params.id;
-    const { title, description, status, priority, tags, dueDate } = req.body;
-    const updatedTask = { title, description, status, priority, tags, dueDate };
+    const {
+      title,
+      description,
+      status,
+      priority,
+      tags,
+      assignedUsers,
+      dueDate,
+    } = req.body;
+    const updatedTask = {
+      title,
+      description,
+      status,
+      priority,
+      tags,
+      assignedUsers,
+      dueDate,
+    };
 
     let task;
 
