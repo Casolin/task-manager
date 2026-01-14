@@ -26,7 +26,7 @@ export const deleteUser = async (req, res) => {
     }
 
     if (userToDelete.role === "admin") {
-      return res.status(403).json({
+      return res.status(401).json({
         message: "You cannot delete an admin user",
       });
     }
