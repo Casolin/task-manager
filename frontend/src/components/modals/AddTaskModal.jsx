@@ -9,6 +9,7 @@ import { getUsers } from "../../api/users";
 export const AddTaskModal = ({ trigger }) => {
   const { user } = useAuth();
   const { addUserTask, getUserTaskList } = useTasks();
+
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
@@ -38,20 +39,30 @@ export const AddTaskModal = ({ trigger }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const toggleUser = (userId) => {
+    setForm((prev) => ({
+      ...prev,
+      assignedUsers: prev.assignedUsers.includes(userId)
+        ? prev.assignedUsers.filter((id) => id !== userId)
+        : [...prev.assignedUsers, userId],
+    }));
+  };
+
   const handleAddTask = async () => {
     if (!form.title.trim()) {
       toast.error("Title is required!");
       return;
     }
+
     try {
       const payload = {
         ...form,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
-        dueDate: form.dueDate,
         createdBy: user?._id,
         assignedUsers:
           form.assignedUsers.length > 0 ? form.assignedUsers : [user?._id],
       };
+
       await addUserTask(payload);
       getUserTaskList();
       toast.success("Task added successfully!");
@@ -73,146 +84,91 @@ export const AddTaskModal = ({ trigger }) => {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-8 rounded-xl w-full max-w-lg text-white shadow-xl space-y-6 overflow-y-auto max-h-[90vh] border border-slate-800">
-          <div className="flex justify-between items-start">
-            <div>
-              <Dialog.Title className="text-xl font-semibold">
-                Add New Task
-              </Dialog.Title>
-              <Dialog.Description className="text-slate-400 text-sm mt-1">
-                Complete the form below to create a new task
-              </Dialog.Description>
-            </div>
+
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 p-8 rounded-xl w-full max-w-lg text-white space-y-6 max-h-[90vh] overflow-y-auto border border-slate-800">
+          <div className="flex justify-between">
+            <Dialog.Title className="text-xl font-semibold">
+              Add New Task
+            </Dialog.Title>
             <Dialog.Close asChild>
-              <button className="text-slate-400 hover:text-white cursor-pointer">
+              <button className="text-slate-400 hover:text-white">
                 <X size={22} />
               </button>
             </Dialog.Close>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="text-slate-400 text-sm mb-1 block">
-                Title *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={form.title}
-                onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <div className="space-y-4">
+            <input
+              name="title"
+              placeholder="Title *"
+              value={form.title}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700"
+            />
 
-            <div>
-              <label className="text-slate-400 text-sm mb-1 block">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={form.description}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700"
+            />
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={form.status}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="Pending">Pending</option>
-                </select>
-              </div>
+              <select
+                name="priority"
+                value={form.priority}
+                onChange={handleChange}
+                className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-700"
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
 
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">
-                  Priority
-                </label>
-                <select
-                  name="priority"
-                  value={form.priority}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
+              <input
+                type="date"
+                name="dueDate"
+                value={form.dueDate}
+                onChange={handleChange}
+                className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-700"
+              />
             </div>
 
             {user?.role === "admin" && (
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">
-                  Assign Users
-                </label>
-                <select
-                  multiple
-                  value={form.assignedUsers}
-                  onChange={(e) => {
-                    const selected = Array.from(e.target.selectedOptions).map(
-                      (opt) => opt.value
-                    );
-                    setForm((prev) => ({ ...prev, assignedUsers: selected }));
-                  }}
-                  className="w-full h-32 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <p className="text-sm text-slate-400 mb-2">
+                  Assign Users (click to select)
+                </p>
+                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
                   {users.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.username}
-                    </option>
+                    <label
+                      key={u._id}
+                      className="flex items-center gap-2 bg-slate-800 px-3 py-2 rounded cursor-pointer hover:bg-slate-700"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.assignedUsers.includes(u._id)}
+                        onChange={() => toggleUser(u._id)}
+                      />
+                      <span>{u.username}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
             )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">
-                  Tags
-                </label>
-                <input
-                  type="text"
-                  name="tags"
-                  placeholder="tag1, tag2"
-                  autoComplete="off"
-                  value={form.tags}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">
-                  Due Date
-                </label>
-                <input
-                  type="date"
-                  name="dueDate"
-                  value={form.dueDate}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
-            <Dialog.Close className="px-5 py-2 bg-slate-700 rounded-lg hover:bg-slate-600 transition cursor-pointer">
+          <div className="flex justify-end gap-3">
+            <Dialog.Close className="px-5 py-2 bg-slate-700 rounded-lg">
               Cancel
             </Dialog.Close>
             <button
               onClick={handleAddTask}
-              className="px-5 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+              className="px-5 py-2 bg-blue-600 rounded-lg"
             >
               Add Task
             </button>
