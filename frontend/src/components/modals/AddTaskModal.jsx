@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import useTasks from "../../hooks/useTasks";
 import useAuth from "../../hooks/useAuth";
 import { toast } from "react-toastify";
@@ -23,28 +23,37 @@ export const AddTaskModal = ({ trigger }) => {
   });
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await getUsers();
-        setUsers(res.data);
-      } catch (err) {
-        toast.error(err.message || "Failed to load users");
-      }
-    };
-    fetchUsers();
-  }, []);
+    if (open && user?.role === "admin") {
+      const fetchUsers = async () => {
+        try {
+          const res = await getUsers();
+          setUsers(res.data);
+        } catch (err) {
+          toast.error(err.message || "Failed to load users");
+        }
+      };
+      fetchUsers();
+    }
+  }, [open, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleUser = (userId) => {
+  const addUser = (userId) => {
+    if (!form.assignedUsers.includes(userId)) {
+      setForm((prev) => ({
+        ...prev,
+        assignedUsers: [...prev.assignedUsers, userId],
+      }));
+    }
+  };
+
+  const removeUser = (userId) => {
     setForm((prev) => ({
       ...prev,
-      assignedUsers: prev.assignedUsers.includes(userId)
-        ? prev.assignedUsers.filter((id) => id !== userId)
-        : [...prev.assignedUsers, userId],
+      assignedUsers: prev.assignedUsers.filter((id) => id !== userId),
     }));
   };
 
@@ -165,21 +174,42 @@ export const AddTaskModal = ({ trigger }) => {
             {user?.role === "admin" && (
               <div>
                 <label className="text-slate-400 text-sm mb-2 block">
-                  Assign Users (click to select)
+                  Assigned Users
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-slate-800 rounded-lg p-2">
+
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {form.assignedUsers.map((userId) => {
+                    const u = users.find((usr) => usr._id === userId);
+                    if (!u) return null;
+                    return (
+                      <div
+                        key={userId}
+                        className="flex items-center gap-1 bg-slate-700 px-2 py-1 rounded"
+                      >
+                        <span>{u.username}</span>
+                        <X
+                          size={14}
+                          className="cursor-pointer text-red-400 hover:text-red-200"
+                          onClick={() => removeUser(userId)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border border-slate-800 rounded-lg p-2">
                   {users.map((u) => (
-                    <label
+                    <div
                       key={u._id}
-                      className="flex items-center gap-2 bg-slate-800 px-3 py-2 rounded cursor-pointer hover:bg-slate-700"
+                      className="flex justify-between items-center bg-slate-800 px-3 py-2 rounded hover:bg-slate-700"
                     >
-                      <input
-                        type="checkbox"
-                        checked={form.assignedUsers.includes(u._id)}
-                        onChange={() => toggleUser(u._id)}
-                      />
                       <span>{u.username}</span>
-                    </label>
+                      <Plus
+                        size={16}
+                        className="text-green-400 hover:text-green-200 cursor-pointer"
+                        onClick={() => addUser(u._id)}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
