@@ -21,12 +21,13 @@ export const deleteUser = async (req, res) => {
     if (!id) return res.status(400).json({ message: "User ID is required" });
 
     const userToDelete = await User.findById(id);
+    console.log(userToDelete);
     if (!userToDelete) {
       return res.status(404).json({ message: "User not found" });
     }
 
     if (userToDelete.role === "admin") {
-      return res.status(401).json({
+      return res.status(403).json({
         message: "You cannot delete an admin user",
       });
     }
