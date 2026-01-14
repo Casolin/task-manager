@@ -1,7 +1,7 @@
 import { Home, Clipboard, FileText, Users, LogOut } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import { NavLink } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { toast } from "react-toastify";
 import imageCompression from "browser-image-compression";
 
@@ -10,18 +10,9 @@ export const Sidebar = () => {
   const fileInputRef = useRef(null);
 
   const handleLogout = () => {
-    const audio = new Audio("/caseohban.mp3");
-    audio.play().catch(() => {});
     logout();
     toast.info("Logged out!");
   };
-
-  useEffect(() => {
-    if (!user) return;
-    const audio = new Audio("/caseoh.mp3");
-    audio.play().catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
 
   const navItems = [
     { name: "Dashboard", icon: <Home size={20} />, path: "/dashboard" },
