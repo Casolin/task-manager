@@ -37,7 +37,7 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
           priority: task.priority || "Medium",
           tags: task.tags?.join(",") || "",
           dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
-          assignedUsers: task.assignedUsers || [],
+          assignedUsers: task.assignedUsers?.map((u) => u._id) || [],
         });
       };
       editForm();
@@ -65,10 +65,17 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
     }
 
     try {
-      await editUserTask(task._id, {
+      const payload = {
         ...form,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
-      });
+        assignedUsers:
+          form.assignedUsers.length > 0
+            ? form.assignedUsers
+            : [task.createdBy || user?._id],
+      };
+
+      await editUserTask(task._id, payload);
+
       getUserTaskList();
       toast.success("Task updated successfully!");
       setOpen(false);
