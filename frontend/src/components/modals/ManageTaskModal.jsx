@@ -29,15 +29,18 @@ export const ManageTaskModal = ({ task, open, setOpen }) => {
 
   useEffect(() => {
     if (task && open) {
-      setForm({
-        title: task.title || "",
-        description: task.description || "",
-        status: task.status || "Pending",
-        priority: task.priority || "Medium",
-        tags: task.tags?.join(",") || "",
-        dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
-        assignedUsers: task.assignedUsers || [],
-      });
+      const editForm = () => {
+        setForm({
+          title: task.title || "",
+          description: task.description || "",
+          status: task.status || "Pending",
+          priority: task.priority || "Medium",
+          tags: task.tags?.join(",") || "",
+          dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
+          assignedUsers: task.assignedUsers || [],
+        });
+      };
+      editForm();
     }
   }, [task, open]);
 
